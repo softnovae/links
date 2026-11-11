@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>영상 속 제품 모음</title>
+<meta name="description" content="쇼츠 영상에 나온 제품 링크 모음">
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --bg: #f6f5f2; --card: #ffffff; --text: #1d1d1f; --sub: #6b6b70;
+    --line: #e6e4df; --accent: #e8442e; --accent-text: #ffffff; --chip: #f0eeea;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141416; --card: #1f1f22; --text: #f2f2f3; --sub: #a0a0a6;
+      --line: #2e2e33; --accent: #ff5a42; --accent-text: #ffffff; --chip: #2a2a2e; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 28px 16px 48px; }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.02em; }
+  .lead { margin: 0 0 18px; color: var(--sub); font-size: 14px; }
+  .search { width: 100%; padding: 13px 14px; font-size: 16px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--card); color: var(--text); outline: none; }
+  .search:focus { border-color: var(--accent); }
+  .list { display: grid; gap: 14px; margin-top: 16px; }
+  .item { display: block; background: var(--card); border: 1px solid var(--line);
+    border-radius: 16px; overflow: hidden; text-decoration: none; color: inherit; }
+  .item:active { transform: scale(0.99); }
+  .thumb { display: block; width: 100%; aspect-ratio: 540 / 310; object-fit: cover; background: var(--chip); }
+  .body { padding: 14px 16px 16px; }
+  .meta { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; flex-wrap: wrap; }
+  .no { font-size: 12px; font-weight: 700; color: var(--accent); }
+  .kw { font-size: 12px; color: var(--sub); background: var(--chip); padding: 2px 8px; border-radius: 99px; }
+  .title { font-size: 16px; font-weight: 700; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .btn { display: block; text-align: center; background: var(--accent); color: var(--accent-text);
+    font-weight: 700; font-size: 15px; padding: 12px; border-radius: 10px; }
+  .empty { display: none; text-align: center; color: var(--sub); padding: 32px 0; font-size: 14px; }
+  .notice { margin-top: 28px; font-size: 12px; color: var(--sub); text-align: center; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>영상 속 제품 모음</h1>
+  <p class="lead">영상 번호나 댓글 키워드로 찾아보세요.</p>
+  <input class="search" id="q" type="search" placeholder="예: 1편, 오픈형, 이어폰" aria-label="제품 검색">
+  <div class="list" id="list"></div>
+  <p class="empty" id="empty">찾는 제품이 없어요. 다른 단어로 검색해 보세요.</p>
+  <p class="notice">이 페이지는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+</main>
+
+<script>
+  // ▼ 영상이 올라갈 때마다 여기에 한 줄씩 추가 (최신 편이 맨 위에 보임)
+  const ITEMS = [
+    { no: 1, title: "귀 아파서 이어폰 빼던 사람, 결국 찾아낸 이것", keyword: "오픈형", tags: "이어폰 오픈형이어폰 러닝", img: "01.jpg", url: "https://link.coupang.com/a/iA0beSNIUm" },
+  ];
+  // ▲ 여기까지
+
+  const list = document.getElementById("list");
+  const empty = document.getElementById("empty");
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const items = [...ITEMS].sort((a, b) => b.no - a.no);
+
+  function render(q) {
+    const s = q.trim().replace(/\s+/g, "").toLowerCase();
+    const shown = items.filter(it => !s ||
+      (it.no + "편" + it.title + it.keyword + it.tags).replace(/\s+/g, "").toLowerCase().includes(s.replace(/^(\d+)$/, "$1편")));
+    list.innerHTML = shown.map(it => `
+      <a class="item" href="${esc(it.url)}" target="_blank" rel="noopener sponsored">
+        <img class="thumb" src="${esc(it.img)}" alt="" loading="lazy">
+        <div class="body">
+          <div class="meta"><span class="no">${it.no}편</span><span class="kw">#${esc(it.keyword)}</span></div>
+          <p class="title">${esc(it.title)}</p>
+          <span class="btn">제품 보러 가기</span>
+        </div>
+      </a>`).join("");
+    empty.style.display = shown.length ? "none" : "block";
+  }
+  document.getElementById("q").addEventListener("input", e => render(e.target.value));
+  render("");
+</script>
+</body>
+</html>
